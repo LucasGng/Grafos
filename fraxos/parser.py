@@ -26,7 +26,7 @@ class Parser():
                 self.configs.append(extract.pop())
             
 
-        print(self.configs)
+        print("congigs", self.configs)
             
 
     def parse_parts(self):
@@ -42,7 +42,7 @@ class Parser():
                         break
                 self.parts.append(part)
 
-        print(self.parts)
+        print("self.parts", self.parts)
         
 
 
@@ -50,10 +50,15 @@ class Parser():
         print(self.configs)
 
         self.graph = Graph(
-            bool(self.configs[0]['directed']),
-            bool(self.configs[1]['weighted']),
+            self.configs[0]['directed'],
+            self.configs[1]['weighted'],
             self.configs[2]['representation'].upper()
         )
+
+        
+        print(self.configs[0]['directed'],
+            self.configs[1]['weighted'],
+            self.configs[2]['representation'].upper())
         
 
     def build_graph(self):
@@ -63,6 +68,7 @@ class Parser():
             self.parse_configs()
             self.setup_graph()
             self.parse_parts()
+            
 
             self.named_vertices =  {v[0]: v[1] for v in self.parts[0]}
             print(self.named_vertices)
@@ -74,7 +80,14 @@ class Parser():
                 self.graph.add_edge(
                     self.named_vertices[aresta[0]],
                     self.named_vertices[aresta[1]],
-                    int(aresta[2])
+                    int(aresta[2]) if self.configs[1]['weighted'] == 'True' else '0'
                 )
+
+                
+            try:
+                self.graph.save_to_pajek('save_graph.net')
+            except:
+                print("Erro ao salvar grafo")
+
         except:
             print("Erro ao construir grafo")

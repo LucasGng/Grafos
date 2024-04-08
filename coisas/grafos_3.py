@@ -1,4 +1,4 @@
-import time, json
+import time
 
 class Graph():
 
@@ -695,109 +695,6 @@ class Graph():
                 
             #return f"{self.vertex_matrix}\n Vértices e index {self.array_name}"
 
-    def save_to_pajek(self, filename):
-        
-        with open(filename, 'w') as file:
-            file.write("% directed={}\n".format(str(self.directed).lower()))
-            file.write("% weighted={}\n".format(str(self.weighted).lower()))
-            file.write("% representation={}\n".format(self.representation))
-            file.write("*Vertices {}\n".format(len(self.vertex_list) if self.representation == "LISTA" else len(self.array_name)))
-            
-            
-            
-            if self.representation == "LISTA":
-                index = 0
-                for vertex in self.vertex_list.keys():
-                    #print(self.vertex_list.items())
-                    file.write("{} {} \n".format(index, vertex))
-                    index += 1
-
-
-
-            elif self.representation == "MATRIZ":
-                print(self.array_name.items())
-                for vertex, index in self.array_name.items():
-                    file.write("{} {}\n".format(index, vertex))
-            file.write("*arcs\n" if self.directed else "*edges\n")
-
-
-
-            if self.representation == "LISTA":
-                
-                for vertex, neighbors in self.vertex_list.items():
-                    for neighbor, weight in neighbors.items():
-                        file.write("{} {} {}\n".format(vertex, neighbor, weight))
-
-
-
-            elif self.representation == "MATRIZ":
-                for vertex, index in self.array_name.items():
-                    for j, weight in enumerate(self.vertex_matrix[index]):
-                        if weight is not None:
-                            file.write("{} {} {}\n".format(index, j, weight))
-
-class Parser():
-    def __init__(self, file):
-        self.file = file 
-        self.lines = []
-        self.configs = []
-        self.parts = []
-        self.graph = None
-
-
-
-    
-
-    def read_file(self):
-        with open(self.file, "r") as file:
-            self.lines = file.readlines()
-
-
-    def parse_configs(self):
-        for line in self.lines:
-            if line.startswith("%"):
-                info = [line.replace("%", "").strip().split("=")]
-                extract = []
-                for i in info:
-                    extract.append({i[0]: i[1].capitalize()})
-                self.configs.append(extract.pop())
-            
-
-        print(self.configs)
-            
-
-    def parse_vertices(self):
-        
-        for i in range(len(self.lines)):
-            if self.lines[i].startswith('*'):
-                part = []
-                for j in range(i+1, len(self.lines)):
-                    if not self.lines[j].startswith('*'):
-
-                        part.append(self.lines[j].replace("\n", "").strip().split(" "))
-
-                self.parts.append(part)
-
-        print(self.parts)
-        
-
-
-
-
-    def setup_graph(self):
-        print(self.configs)
-
-        self.graph = Graph(
-            bool(self.configs[0]['directed']),
-            bool(self.configs[1]['weighted']),
-            self.configs[2]['representation'].upper()
-        )
-
-
-            
-
-
-
 if __name__ == "__main__":
  
                     #DIRECTED  WEIGHT = false
@@ -1168,8 +1065,3 @@ if __name__ == "__main__":
     print(Grafo_matriz.get_weight("A", "C"))
 
     print(f"MST = {Grafo_matriz.prim()}")
-
-
-    Grafo_lista.save_to_pajek("grafo_lista.net")
-    Grafo_matriz.save_to_pajek("grafo_matriz.net")
-
