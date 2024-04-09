@@ -783,46 +783,50 @@ class Graph():
                 
             #return f"{self.vertex_matrix}\n Vértices e index {self.array_name}"
 
+   
     def save_to_pajek(self, filename):
-        # Metodo para salvar o Grafo em um arquivo .net
         
         with open(filename, 'w') as file:
-            file.write("% directed={}\n".format(str(self.directed).lower()))
-            file.write("% weighted={}\n".format(str(self.weighted).lower()))
-            file.write("% representation={}\n".format(self.representation))
-            file.write("*Vertices {}\n".format(len(self.vertex_list) if self.representation == "LISTA" else len(self.array_name)))
-            list_list ={}
-            
+            file.write(f"% directed={str(self.directed)}\n")
+            file.write(f"% weighted={str(self.weighted)}\n")
+            file.write(f"% representation={self.representation}\n")
+            file.write(f"*Vertices {len(self.vertex_list) if self.representation == 'LISTA' else len(self.array_name)}\n")
+
+
             
             if self.representation == "LISTA":
-                index = 0
-                for vertex in self.vertex_list.keys():
-                    file.write("{} {} \n".format(index, vertex))
-                    index += 1
-                    list_list[index] = vertex
 
+                
+                vertex_indices = {vertex: index for index, vertex in enumerate(self.vertex_list.keys())}
+
+                
+                for index, vertex in enumerate(self.vertex_list.keys()):
+                    file.write(f"{index} {vertex} \n")
+
+                file.write("*arcs\n" if self.directed else "*edges\n")
+
+                for vertex, neighbors in self.vertex_list.items():
+                    vertex_index = vertex_indices[vertex]
+                    for neighbor, weight in neighbors.items():
+                        neighbor_index = vertex_indices[neighbor]
+                        if self.weighted == "False" and weight is not None:
+                                file.write(f"{vertex_index} {neighbor_index}\n")
+                        elif self.weighted == "True" and weight is not None:
+                                file.write(f"{vertex_index} {neighbor_index} {weight}\n")
 
 
 
             elif self.representation == "MATRIZ":
                 print(self.array_name.items())
                 for vertex, index in self.array_name.items():
-                    file.write("{} {}\n".format(index, vertex))
-            file.write("*arcs\n" if self.directed else "*edges\n")
+                    file.write(f"{index} {vertex}\n")
+                    
+                file.write("*arcs\n" if self.directed else "*edges\n")
 
-
-
-            if self.representation == "LISTA":
-                
-                for vertex, neighbors in self.vertex_list.items():
-                    for neighbor, weight in neighbors.items():
-                        file.write("{} {} {}\n".format(vertex, neighbor, weight))
-
-
-
-            elif self.representation == "MATRIZ":
                 for vertex, index in self.array_name.items():
                     for j, weight in enumerate(self.vertex_matrix[index]):
-                        if weight is not None:
-                            file.write("{} {} {}\n".format(index, j, weight))
-
+                        
+                        if self.weighted == "False" and weight is not None:
+                                file.write(f"{index} {j}\n")
+                        elif self.weighted == "True" and weight is not None:
+                                file.write(f"{index} {j} {weight}\n")
