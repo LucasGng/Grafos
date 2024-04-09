@@ -2,21 +2,29 @@ from pygraph.grafo import Graph
 
 class Parser():
     def __init__(self, file):
+        # Atributo com o nome do arquivo
         self.file = file 
+        # Atributo para salvar as linhas numa lista
         self.lines = []
+        # Atributo para salvar as configurações do grafo  (direcionado, ponderado e representação)
         self.configs = []
+        # Atributo para salvar as partes do grafo (vértices e arestas)
         self.parts = []
+        # Atributo para gerar o grafo
         self.graph = None
+        # Atributo para salvar os vértices nomeados
         self.named_vertices = {}
 
     
 
     def read_file(self):
+        # Metodo para abrir o arquivo
         with open(self.file, "r") as file:
             self.lines = file.readlines()
 
 
     def parse_configs(self):
+        # Metodo para extrair as configurações do grafo (direcionado, ponderado e representação)
         for line in self.lines:
             if line.startswith("%"):
                 info = [line.replace("%", "").strip().split("=")]
@@ -26,11 +34,11 @@ class Parser():
                 self.configs.append(extract.pop())
             
 
-        print(self.configs)
+        # print(self.configs)
             
 
     def parse_parts(self):
-        
+        # Metodo para extrair as partes do grafo (vértices e arestas)
         
         for i in range(len(self.lines)):
             if self.lines[i].startswith('*'):
@@ -42,12 +50,13 @@ class Parser():
                         break
                 self.parts.append(part)
 
-        print(self.parts)
+        # print(self.parts)
         
 
 
     def setup_graph(self):
-        print(self.configs)
+        # Metodo para criar o grafo
+        # print(self.configs)
 
         self.graph = Graph(
             bool(self.configs[0]['directed']),
@@ -57,6 +66,7 @@ class Parser():
         
 
     def build_graph(self):
+        # Metodo para construir o grafo de acordo com o arquivo
 
         try:
             self.read_file()

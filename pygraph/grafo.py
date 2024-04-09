@@ -564,7 +564,7 @@ class Graph():
 
     def isConnected(self):
 
-        #chama a função de warshall e análisa se todos os eleentos são diferentes de 0
+        # Chama a função de warshall e análisa se todos os elementos são diferentes de 0
         warshall = self.warshall()
         warshall_matrix = warshall.vertex_matrix
         for i in range(len(warshall_matrix)):
@@ -677,6 +677,7 @@ class Graph():
         for vertex, index in matrix_graph.array_name.items():
             index_name[str(index)] = vertex
 
+        # Adiciona as arestas no grafo de Warshall de acordo com a matriz de Warshall
         for i in range(len(matrix_graph.vertex_matrix)):
             for j in range(len(matrix_graph.vertex_matrix)):
                 if mat_warshall[i][j] != None:
@@ -703,21 +704,26 @@ class Graph():
             return False
         
     def distribution_of_degree(self):
+        # Lista para salvar os Graus
         degrees = []
 
+        # Pega os vértices
         if self.representation == "LISTA":
             vertices = list(self.vertex_list.keys())
         elif self.representation == "MATRIZ":
             vertices = list(self.array_name.keys())
 
+        # Pega o grau de cada vértice e salva na lista
         for vertex in vertices:
             degrees.append(self.degree(vertex))
 
+        # Plota o histograma
         plt.hist(degrees, bins=range(min(degrees), max(degrees) + 1), alpha=0.7, edgecolor='black', color='blue', linewidth=2)
         plt.title('Distribution of Degrees')
         plt.xlabel('Degree')
         plt.ylabel('Frequency')
 
+        # Salva o arquivo e mostra o gráfico gerado
         plt.savefig("degree_distribution.png")
         plt.show()
 
@@ -778,6 +784,7 @@ class Graph():
             #return f"{self.vertex_matrix}\n Vértices e index {self.array_name}"
 
     def save_to_pajek(self, filename):
+        # Metodo para salvar o Grafo em um arquivo .net
         
         with open(filename, 'w') as file:
             file.write("% directed={}\n".format(str(self.directed).lower()))
