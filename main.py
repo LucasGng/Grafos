@@ -389,7 +389,27 @@ print(grafo_teste_warshall)
 print("Warshall:")
 print(grafo_teste_warshall.warshall())
 
-grafo_teste_warshall.distribution_of_degree()
+
+print("----------------------------")
+
+grafo_teste_warshall_list = Graph(True,False,"LISTA")
+
+grafo_teste_warshall_list.add_vertex("A")
+grafo_teste_warshall_list.add_vertex("B")
+grafo_teste_warshall_list.add_vertex("C")
+grafo_teste_warshall_list.add_vertex("D")
+grafo_teste_warshall_list.add_vertex("E")
+
+grafo_teste_warshall_list.add_edge("A", "B", 1)
+grafo_teste_warshall_list.add_edge("B", "C", 1)
+grafo_teste_warshall_list.add_edge("E", "D", 1)
+grafo_teste_warshall_list.add_edge("B", "E", 1)
+
+print(grafo_teste_warshall_list)               
+print("Warshall:")
+print(grafo_teste_warshall_list.warshall())
+
+# grafo_teste_warshall.distribution_of_degree()
 
 
 # def load_from_pajek(filename):
