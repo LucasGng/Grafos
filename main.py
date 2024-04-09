@@ -412,14 +412,9 @@ print(grafo_teste_warshall_list.warshall())
 # grafo_teste_warshall.distribution_of_degree()
 
 
-# def load_from_pajek(filename):
-#     with open(filename, 'r') as file:
-#         for line in file:
-#             print('gay')
-# grafo = load_from_pajek("grafo_matriz.net")
 
-# parser = Parser("coisas/grafo_lista.net")
-# parser.build_graph()
+parser = Parser("arquivos/grafo_lista.net")
+parser.build_graph()
 
-# print(parser.graph)
+print(parser.graph)
 
