@@ -409,12 +409,13 @@ print(grafo_teste_warshall_list)
 print("Warshall:")
 print(grafo_teste_warshall_list.warshall())
 
-# grafo_teste_warshall.distribution_of_degree()
+#grafo_teste_warshall.distribution_of_degree()
 
 
 
 parser = Parser("arquivos/grafo_lista.net")
 parser.build_graph()
+parser.graph.save_to_pajek('save_graph.net')
 
 print(parser.graph)
 

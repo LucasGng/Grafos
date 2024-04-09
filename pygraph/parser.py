@@ -25,7 +25,7 @@ class Parser():
 
     def parse_configs(self):
         # Metodo para extrair as configurações do grafo (direcionado, ponderado e representação)
-        
+
         for line in self.lines:
             if line.startswith("%"):
                 info = [line.replace("%", "").strip().split("=")]
@@ -91,11 +91,6 @@ class Parser():
                     int(aresta[2]) if self.configs[1]['weighted'] == 'True' else '0'
                 )
 
-                
-            try:
-                self.graph.save_to_pajek('save_graph.net')
-            except:
-                print("Erro ao salvar grafo")
-
+   
         except:
             print("Erro ao construir grafo")
