@@ -1,4 +1,3 @@
-from pygraph.parser import Parser
 from pygraph.grafo import Graph
 
     #DIRECTED  WEIGHT = false
@@ -411,11 +410,32 @@ print(grafo_teste_warshall_list.warshall())
 
 #grafo_teste_warshall.distribution_of_degree()
 
+print("----------------------------")
+print(grafo_teste_warshall_list)  
+grafo_teste_warshall_list.save_to_pajek("grafo_teste_warshall_list.net")
+newgrafo = Graph(filename="grafo_teste_warshall_list.net")
+print(newgrafo)
+print("----------------------------")
 
 
-parser = Parser("arquivos/grafo_lista.net")
-parser.build_graph()
-parser.graph.save_to_pajek('save_graph.net')
+print("----------------------------")
+grafo_teste = Graph(True,True,"MATRIZ")
 
-print(parser.graph)
+grafo_teste.add_vertex("A")
+grafo_teste.add_vertex("B")
+grafo_teste.add_vertex("C")
+grafo_teste.add_vertex("D")
+grafo_teste.add_vertex("E")
+
+grafo_teste.add_edge("A", "B", 3)
+grafo_teste.add_edge("B", "C", 5)
+grafo_teste.add_edge("E", "D", 6)
+grafo_teste.add_edge("B", "E", 2)
+
+print(grafo_teste)
+grafo_teste.save_to_pajek("grafo_teste.net")
+newgrafo = Graph(filename="grafo_teste.net")
+print(newgrafo)
+print("----------------------------")
+# grafo_teste_warshall_list.distribution_of_degree()
 

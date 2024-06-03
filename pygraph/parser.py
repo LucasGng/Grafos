@@ -1,4 +1,4 @@
-from pygraph.grafo import Graph
+# from pygraph.grafo import Graph
 
 class Parser():
     def __init__(self, file):

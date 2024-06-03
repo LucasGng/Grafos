@@ -1,0 +1,14 @@
+% directed=True
+% weighted=True
+% representation=MATRIZ
+*Vertices 5
+0 A
+1 B
+2 C
+3 D
+4 E
+*arcs
+0 1 3
+1 2 5
+1 4 2
+4 3 6

@@ -1,0 +1,14 @@
+% directed=True
+% weighted=False
+% representation=LISTA
+*Vertices 5
+0 A 
+1 B 
+2 C 
+3 D 
+4 E 
+*arcs
+0 1
+1 2
+1 4
+4 3

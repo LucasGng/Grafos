@@ -1,20 +1,85 @@
 import time
 import matplotlib.pyplot as plt
+from random import random
+import seaborn as sns
 
 class Graph():
 
-    def __init__(self, directed, weighted, representation):
+    def __init__(self, directed=False, weighted=False, representation="LISTA", filename=""):
 
-        self.directed = directed #boolean
-        self.weighted = weighted #boolean
-        self.representation = representation #string
+        if filename == "":
+            self.directed = directed #boolean
+            self.weighted = weighted #boolean
+            self.representation = representation #string
 
-        if self.representation == "MATRIZ":
-            self.vertex_matrix = []
-            self.array_name = {} #para indexar as colunas e linhas com o nome do vértice {"vértice": index}
-        
-        elif self.representation == "LISTA":
-            self.vertex_list = {}#dicionário de vértices ("vértice": {"vizinho" : peso, ...})
+            if self.representation == "MATRIZ":
+                self.vertex_matrix = []
+                self.array_name = {} #para indexar as colunas e linhas com o nome do vértice {"vértice": index}
+            
+            elif self.representation == "LISTA":
+                self.vertex_list = {}#dicionário de vértices ("vértice": {"vizinho" : peso, ...})
+        else:
+            # Lista para salvar as linhas do arquivo
+            lines = []
+            # Lista para salvar as configurações do grafo
+            configs = []
+            # Lista para salvar as partes do grafo
+            parts = []
+            # Dicionário para salvar os vértices nomeados
+            named_vertices = {}
+            
+            # Lê o arquivo
+            with open(filename, "r") as file:
+                lines = file.readlines()
+                
+            # Extrai as configurações do grafo (direcionado, ponderado e representação)    
+            for line in lines:
+                if line.startswith("%"):
+                    info = [line.replace("%", "").strip().split("=")]
+                    extract = []
+                    for i in info:
+                        extract.append({i[0]: i[1].capitalize()})
+                    configs.append(extract.pop())
+
+            # Extrai as partes do grafo (vértices e arestas)
+            for i in range(len(lines)):
+                if lines[i].startswith('*'):
+                    part = []
+                    for j in range(i+1, len(lines)):
+                        if not lines[j].startswith('*'):
+                            part.append(lines[j].replace("\n", "").strip().split(" "))
+                        else:
+                            break
+                    parts.append(part)
+
+            # Cria o grafo
+            self.directed = configs[0]['directed']
+            self.weighted = configs[1]['weighted']
+            self.representation = configs[2]['representation'].upper()
+
+            if self.representation == "MATRIZ":
+                self.vertex_matrix = []
+                self.array_name = {} #para indexar as colunas e linhas com o nome do vértice {"vértice": index}
+            
+            elif self.representation == "LISTA":
+                self.vertex_list = {}#dicionário de vértices ("vértice": {"vizinho" : peso, ...})
+
+            try:
+                named_vertices =  {v[0]: v[1] for v in parts[0]}
+
+                for vertice in parts[0]:
+                    self.add_vertex(vertice[1])
+
+                for aresta in parts[1]:
+                    self.add_edge(
+                        named_vertices[aresta[0]],
+                        named_vertices[aresta[1]],
+                        int(aresta[2]) if configs[1]['weighted'] == 'True' else 1
+                )
+
+   
+            except:
+                print("Erro ao construir grafo")
     
 
     def check_vertex(self, vertex): #verifica se os vértices existem no grafo
@@ -172,7 +237,7 @@ class Graph():
                 return True
         return False
     
-    def add_edge(self, begin, end, weight):
+    def add_edge(self, begin, end, weight=1):
 
         if self.check_vertex(begin) == False or self.check_vertex(end) == False:
 
@@ -681,7 +746,7 @@ class Graph():
         for i in range(len(matrix_graph.vertex_matrix)):
             for j in range(len(matrix_graph.vertex_matrix)):
                 if mat_warshall[i][j] != None:
-                    Warshall.add_edge(index_name[str(i)], index_name[str(j)], mat_warshall[i][j])
+                    Warshall.add_edge(index_name[str(i)], index_name[str(j)], 1)
 
         return Warshall
     
@@ -714,11 +779,10 @@ class Graph():
             vertices = list(self.array_name.keys())
 
         # Pega o grau de cada vértice e salva na lista
-        for vertex in vertices:
-            degrees.append(self.degree(vertex))
-
+        degrees = [self.degree(vertex) for vertex in vertices]
         # Plota o histograma
-        plt.hist(degrees, bins=range(min(degrees), max(degrees) + 1), alpha=0.7, edgecolor='black', color='blue', linewidth=2)
+        
+        sns.countplot(x=degrees, color='blue')
         plt.title('Distribution of Degrees')
         plt.xlabel('Degree')
         plt.ylabel('Frequency')
@@ -743,7 +807,7 @@ class Graph():
 
                 for j in self.vertex_list[i].keys():
 
-                    string_2 += f"{j}, "
+                    string_2 += f"{j, self.get_weight(i, j)}, "
 
                 idx_vertex+=1
 
@@ -798,7 +862,6 @@ class Graph():
 
                 
                 vertex_indices = {vertex: index for index, vertex in enumerate(self.vertex_list.keys())}
-
                 
                 for index, vertex in enumerate(self.vertex_list.keys()):
                     file.write(f"{index} {vertex} \n")
@@ -809,15 +872,15 @@ class Graph():
                     vertex_index = vertex_indices[vertex]
                     for neighbor, weight in neighbors.items():
                         neighbor_index = vertex_indices[neighbor]
-                        if self.weighted == "False" and weight is not None:
+                        if self.weighted == False and weight is not None:
                                 file.write(f"{vertex_index} {neighbor_index}\n")
-                        elif self.weighted == "True" and weight is not None:
+                        elif self.weighted == True and weight is not None:
                                 file.write(f"{vertex_index} {neighbor_index} {weight}\n")
 
 
 
+
             elif self.representation == "MATRIZ":
-                print(self.array_name.items())
                 for vertex, index in self.array_name.items():
                     file.write(f"{index} {vertex}\n")
                     
@@ -826,7 +889,524 @@ class Graph():
                 for vertex, index in self.array_name.items():
                     for j, weight in enumerate(self.vertex_matrix[index]):
                         
-                        if self.weighted == "False" and weight is not None:
+                        if self.weighted == False and weight is not None:
                                 file.write(f"{index} {j}\n")
-                        elif self.weighted == "True" and weight is not None:
+                        elif self.weighted == True and weight is not None:
                                 file.write(f"{index} {j} {weight}\n")
+  
+    ####################################### TDE2 #################################### #
+
+    def degree_centrality(self):
+
+        result = {}
+
+        if self.representation == "MATRIZ":
+
+            for vertex in self.array_name:
+                
+                #print(vertex)
+                print(self.degree(vertex))
+
+                result[vertex] = (self.degree(vertex) / (len(self.array_name)-1))
+        
+        elif self.representation == "LISTA":
+
+            for vertex in self.vertex_list:
+
+                #print(vertex)
+                #print(self.degree(vertex))
+
+                result[vertex] = (self.degree(vertex) / (len(self.vertex_list)-1))
+
+    #qqqq
+        return result
+
+    """def component_extraction(self):
+
+        components_list = []
+        general_list = []
+
+        if self.representation == "LISTA":
+            
+            if self.directed == True:
+
+                return []
+            
+            for vertex in self.vertex_list:
+                
+                intermediary = []
+                
+                if vertex not in general_list:
+                    
+                    intermediary.append(vertex)
+                    
+                    for neighbor in self.get_neighbors(vertex):
+
+                        if neighbor != vertex: #only first condidition before and
+                            #print(f"vertex{vertex} neighbor {neighbor}")
+                            intermediary.append(neighbor)
+
+                        general_list.append(neighbor)
+                        
+                general_list.append(vertex)
+
+                if bool(intermediary): #verifica se está vazio
+
+                    components_list.append(intermediary)
+                    
+        elif self.representation == "MATRIZ":
+
+            if self.directed == True:
+
+                return []
+            
+            for vertex in self.array_name:
+                
+                intermediary = []
+                
+                if vertex not in general_list:
+                    
+                    intermediary.append(vertex)
+                    
+                    for neighbor in self.get_neighbors(vertex):
+                        
+                        if neighbor != vertex:
+                            #print(f"vertex{vertex} neighbor {neighbor}")
+                            intermediary.append(neighbor)
+
+                        general_list.append(neighbor)
+                        
+                general_list.append(vertex)
+
+                if bool(intermediary): #verifica se está vazio
+
+                    components_list.append(intermediary)
+    
+        return components_list"""
+    
+    #EXTRAÇÃO DE COMPONENTES
+    def component_extraction(self):
+
+        if self.directed == True:
+            
+            return []
+
+        components_list = []
+        visited = set()
+
+        if self.representation == "LISTA":
+
+            for vertex in self.vertex_list:
+
+                if vertex not in visited:
+
+                    component = self._dfs(vertex, visited)
+                    print(f"vertex {vertex} components {component}") #remover dps
+                    components_list.append(component)
+        
+        elif self.representation == "MATRIZ":
+
+            for vertex in self.array_name:
+
+                if vertex not in visited:
+                    component = self._dfs(vertex, visited)
+                    print(f"vertex {vertex} components {component}") #comentar
+                    components_list.append(component)
+
+        return components_list
+    
+    # EXTRAÇÃO DE COMPONENTES FORTEMENTE CONECTADOS
+    def component_extraction_directed(self):
+
+        component_directed = []
+
+        if self.directed == False:
+            
+            return []
+        
+        else:
+
+            component_directed.append(0) # só para testar antes da implementação
+        
+        return component_directed
+
+    #PROCURA EM PROFUNDIDADE PROJETADA PARA A FUNÇÃO DE COMPONENT EXTRACTION
+    def _dfs(self, vertex, visited): 
+        component = []
+        stack = [vertex]
+
+        while stack:
+            current_vertex = stack.pop()
+            
+            if current_vertex not in visited:
+
+                visited.add(current_vertex)
+                component.append(current_vertex)
+
+                #itera sobre os vizinhos do vertex da iteração atual e os adiciona no visited caso não foram adicionados
+                for neighbor in self.get_neighbors(current_vertex):
+
+                    if neighbor not in visited:
+                        stack.append(neighbor)
+
+        #retorna os vértices alcançavéis por vertex do parâmetro
+        return component
+
+    #MÚLTIPLOS DIJKSTRA
+    def multiple_dijkstra(self, begin):
+        if self.check_vertex(begin) == False:
+            return [], None, 0
+        
+        pi = {}
+        accumulated_cost = {}
+        vertices = {}
+
+        #copia os valores de origens diferentes
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+
+        for vertex in vertices:
+        
+            accumulated_cost[vertex] = +1e10 #mudar depois
+            pi[vertex] = []  # predecessores começam vazios
+
+        accumulated_cost[begin] = 0.0
+
+        q = list(vertices.keys()) #aqui se converte para lista ao invés de usar dicionário
+
+        while len(q) > 0:
+            current_node = self.extract_min(q, accumulated_cost)
+
+            if current_node is None:
+                break
+
+            q.remove(current_node)
+
+            #itera sobre os vizinhos do vertice atual pegando os menores caminhos, igual o tde1
+            for neighbor in self.get_neighbors(current_node):
+                new_cost = accumulated_cost[current_node] + self.get_weight(current_node, neighbor)
+                if new_cost < accumulated_cost[neighbor]:
+                    accumulated_cost[neighbor] = new_cost
+                    pi[neighbor] = [current_node]
+                elif new_cost == accumulated_cost[neighbor]:
+                    pi[neighbor].append(current_node)
+
+
+        # logica:
+        paths = []
+        for vertex in vertices:
+            if vertex != begin: # pula o inicial
+                caminhos_vertex = self._dfs_dijkstra(vertex, pi)
+                for c in caminhos_vertex:
+                    paths.append(c)
+
+        # paths = []
+        # for vertex in vertices:
+        #     path = []
+        #     current_node = vertex
+        #     while current_node != begin:
+        #         """if len(pi[current_node]) > 1:
+        #             debug = 1"""
+        #         for value in pi[vertex]:
+        #             #print(f"vertex{vertex} predecessors {value}")
+        #             self._dfs_dijkstra(pi, vertex)
+        #         if not pi[current_node]:  # sai se não houver predecessor
+        #             break
+        #         path.insert(0, current_node)
+        #         current_node = pi[current_node][0]  # primeiro predecessor
+        
+            # se há caminho
+            #     if path:
+            #         path.insert(0, begin)
+            #         paths.append(path)
+
+            # print(path)
+        #print(paths)
+        return paths
+    
+    def _dfs_dijkstra(self, vertex, pi):
+        paths = [] 
+        
+        def dfs_recursive(current_vertex, current_path):
+
+            # se o vértice atual não tem predecessores encerra e retorna o path
+            if not pi[current_vertex]:
+
+                if current_vertex != vertex: #IDKKKKKKKKKKKKKKKKKKKKKKK
+                    reversed_path = current_path[::-1]
+                    paths.append(reversed_path)
+                #paths.append(current_path[:])
+                return
+            
+            # recursividade para garantir o retorno aos múltiplos vizinhos
+            for neighbor in pi[current_vertex]:
+
+                current_path.append(neighbor)
+                dfs_recursive(neighbor, current_path)
+                # ao voltar se remove o vizinho já explorado
+                current_path.pop()
+        
+        dfs_recursive(vertex, [vertex])
+    
+        return paths
+    
+    """
+    def _dfs_dijkstra(self, vertex, pi):
+
+        caminhos = []
+        stack = [vertex]
+        caminho_atual = []
+
+        while stack:
+
+            current_vertex = stack.pop()
+            
+            caminho_atual.append(current_vertex)
+
+            #itera sobre os vizinhos do vertex da iteração atual e os adiciona no visited caso não foram adicionados
+            vizinhos = pi[current_vertex]
+            if len(vizinhos) > 0:
+            
+                for neighbor in vizinhos:
+                    stack.append(neighbor)
+            
+            else:
+                caminho_atual.reverse()
+                #caminhos.append(caminho_atual[:])
+                caminhos.append(caminho_atual)
+                #del caminho_atual[0]
+                caminho_atual = [vertex]
+            
+        #retorna os vértices alcançavéis por vertex do parâmetro
+        return caminhos""" 
+        
+    # FUNÇÃO DE EXCENTRICIDADE
+    
+    def get_eccentricity(self):
+
+        vertices = {}
+        ecc_dict = {} # retorno da função
+
+        if self.directed == False:
+            component_number = len(self.component_extraction())
+
+        elif self.directed == True:
+            component_number = len(self.component_extraction_directed())
+        
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+
+        if component_number > 1: # grafo desconexo == + de 1 componente
+
+            print("desconexo") #remover
+
+            for v in vertices:
+                
+             ecc_dict[v] = None
+        
+        else:
+            
+            # para cada vértice calcula o maior dos menores caminhos retornados pelo dijkstra múltiplo
+            for v in vertices:
+
+                v_paths = self.multiple_dijkstra(v)
+
+                if len(v_paths) > 0: # para grafos direcionados onde não há como sair de um vértice
+
+                    #max_path = max(i for i in self.multiple_dijkstra(v)) # apagar dps
+                    max_length = max(len(i) for i in self.multiple_dijkstra(v))
+
+                    #print(f"vertex {v} eccentrcity: {max_path} length: {max_length}") #apagar dps
+                
+                    # decrementa um para desconsiderar o vértice de sáida
+                    ecc_dict[v] = max_length-1 
+
+        return ecc_dict
+
+    def get_diameter(self):
+
+        if self.directed == False:
+            component_number = len(self.component_extraction())
+
+        elif self.directed == True:
+            component_number = len(self.component_extraction_directed())
+
+        #diameter_dict = {}
+        diameter_value = None
+
+        if component_number == 1: # grafo desconexo == + de 1 componente
+
+            eccentricity_dict = self.get_eccentricity()
+
+            max_ecc = max(eccentricity_dict.values())
+            diameter_value = max_ecc
+
+            """for vertex in eccentricity_dict:
+
+                if eccentricity_dict[vertex] > max_ecc:
+
+                    diameter_dict[vertex] = eccentricity_dict[vertex]
+
+                print(f"{vertex} ecc {eccentricity_dict[vertex]}")"""
+        
+        #return diameter_dict
+        return diameter_value
+    
+
+    def get_radius(self):
+
+        if self.directed == False:
+            component_number = len(self.component_extraction())
+
+        elif self.directed == True:
+            component_number = len(self.component_extraction_directed())
+
+        #radius_dict = {}
+        radius_value = None
+
+        if component_number == 1: # grafo desconexo == + de 1 componente
+
+            eccentricity_dict = self.get_eccentricity()
+
+            min_ecc = min(eccentricity_dict.values())
+            radius_value = min_ecc
+
+            """for vertex in eccentricity_dict:
+
+                if eccentricity_dict[vertex] < min_ecc:
+
+                    radius_dict[vertex] = eccentricity_dict[vertex]
+
+                print(f"{vertex} ecc {eccentricity_dict[vertex]}")"""
+        
+        #return radius_dict
+        return radius_value
+    
+
+    def closeness_centrality(self):
+
+        closeness_dict = {}
+        vertices = {}
+        final_vertex = [] # controle dos vertices finais de cada caminho pra evitar soma de distância pro mesmo vertice
+        dist_sum = 0 # soma das distâncias de um vertice para todos os outros
+
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+
+        
+        # calcula a soma das distancias minimas de cada vertice para todos os outros, 
+        #depois aplica a formula, coloca com a chave sendo o proprio vertice da iteracao atual no dicionario
+        for v in vertices:
+
+            for paths in self.multiple_dijkstra(v):
+
+                if paths[-1] not in final_vertex:
+
+                    final_vertex.append(paths[-1])
+
+                    #print(paths[-1]) # remover dps
+                    #print(f"{v} {paths}") # remover dps
+
+                    # itera sobre as arestas de cada menor caminho de um vértico coleta a soma dos pesos
+                    # se um grafo for nao ponderado, o peso é 1 então equivale à propria dist. entre os vértices
+                    #dist_sum += sum(self.get_weight(paths[i], paths[i+1]) for i in range(len(paths)-1))
+
+                    dist_sum += len(paths) - 1 # subtrai um porque a distância [A, B, C] de A pra C é 2 não 3
+                
+                #print(f"Vertex {v} sum {dist_sum}")
+
+            print(f"{v} sum_dist {dist_sum}")
+            
+            if dist_sum > 0:
+                closeness_dict[v] = (len(vertices)-1) / dist_sum
+            else: 
+                closeness_dict[v] = 0 # para grafos direcionados onde não há como sair de um vértice
+            dist_sum = 0
+            final_vertex = []
+
+        return closeness_dict
+
+
+    #FUNÇÃO DE CENTRALIDADE DE INTERMEDIAÇÃO(SEM NORMALIZAÇÃO)
+    def betweenness_centrality(self):
+
+        bet_dict = {} # retorno
+        destinations_v_in_middle = {} # dicionário de destinos onde o vértice estava no meio com a qunt. de vezes
+        sum_centrality = 0
+        v_destinations = {} # dicionário de destinos com a qunt. de ocorrências, chave é tupla de (incio, fim)
+        
+        smaller_paths = self.remove_repeated_dijkstra() # filtra os caminhos removendo duplicatas
+        
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+
+        for v in vertices:
+       
+            for path in smaller_paths:  
+                
+                # caso o caminho não exista no dicionário de caminhos
+                if (path[0], path[-1]) not in v_destinations:
+                    v_destinations[(path[0], path[-1])] = 0
+                    destinations_v_in_middle[(path[0], path[-1])] = 0
+
+                if v != path[0] and v!= path[-1] and v in path: # o vértice está no meio do caminho
+
+                    destinations_v_in_middle[(path[0], path[-1])] += 1
+
+                    print(f"{v} no meio de {path}") # remover dps
+            
+                v_destinations[(path[0], path[-1])] +=1
+
+            for begin_end in v_destinations:
+
+                sum_centrality += destinations_v_in_middle[begin_end] / v_destinations[begin_end]
+
+                print(f"soma atual: {sum_centrality} - procurando {v} em {begin_end}") # remover dps
+            
+            bet_dict[v] = (2*sum_centrality) / ((len(vertices) - 1)*(len(vertices) - 2)) 
+
+            sum_centrality = 0 # resete para o próximo
+            destinations_v_in_middle.clear()
+            v_destinations.clear()
+        
+        return bet_dict 
+
+    # FUNÇÃO QUE REMOVE CAMINHOS REPETIDOS PARA FUNÇÕES DE CENTRALIDADE DE INTERMEDIAÇÃO EM GRAFOS NÃO DIRECIONADOS
+    def remove_repeated_dijkstra(self):
+
+        smaller_paths = []
+
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+
+        if self.directed == False:
+
+            already_iterated = []
+
+            for v in vertices:
+
+                for paths in self.multiple_dijkstra(v):
+
+                    # SE O VÉRTICE DE CHEGADA DE CADA CAMINHO JÁ TEVE SUA ITERAÇÃO CONCLUÍDA
+                    # O CAMINHO É IGNORADO E NÃO COLOCADO NO smaller_paths, CASO CONTRÁRIO, O CAMINHO É ADICIONADO
+                    if paths[-1] not in already_iterated:
+
+                        smaller_paths.append(paths)
+                
+                already_iterated.append(v)
+            
+            return smaller_paths
+        
+        elif self.directed == True: # remover dps
+
+            print("nada a fazer") # remover dps
