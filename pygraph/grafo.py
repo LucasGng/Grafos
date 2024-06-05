@@ -1610,3 +1610,73 @@ class Graph():
                 if self.check_edge(par1, par2) == True:
                     new_weight = self.get_weight(par1, par2) + 1
                     self.update_weight(par1, par2, new_weight)
+
+
+
+        # Busca em profundidade para armazenar os tempos de visita de cada nó
+    def DFS_finish_time(self, vertex, visited, finish_time, time=0):
+        visited.add(vertex)
+        for neighbor in self.get_neighbors(vertex):
+            if neighbor not in visited:
+                time = self.DFS_finish_time(neighbor, visited, finish_time, time)
+        finish_time[vertex] = time
+        return time + 1
+
+    # Metodo que gera o grafo transposto
+    def getTranspose(self):
+        g = Graph(self.directed,self.weighted,self.representation)
+
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+        
+        for vertex in vertices:
+            g.add_vertex(vertex)
+
+        for vertex in vertices:
+            for neighbor in self.get_neighbors(vertex):
+                g.add_edge(neighbor, vertex)
+        
+        return g
+
+    # Busca em profundidade para encontrar os componentes fortemente conectados
+    def DFS_get_components(self, vertices, visited, components):
+        for vertex in vertices:
+            if vertex not in visited:
+                component = set()
+                stack = [vertex]
+                while stack:
+                    v = stack.pop()
+                    if v not in visited:
+                        visited.add(v)
+                        component.add(v)
+                        for neighbor in self.get_neighbors(v):
+                            if neighbor not in visited:
+                                stack.append(neighbor)
+                components.append(component)
+    
+    # Função que retorna os componentes fortemente conectados
+    def SCCs(self):
+        visited = set()
+        finish_time = {}
+        time = 0
+
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+
+        for vertex in vertices:
+            if vertex not in visited:
+                time = self.DFS_finish_time(vertex, visited, finish_time, time)
+        gr = self.getTranspose()
+        visited = set()
+        
+        vertices = sorted(vertices, key=lambda v: finish_time[v], reverse=True)
+
+        components = []
+        components.append(gr.DFS_get_components(vertices, visited, components))
+        components.pop(-1)
+
+        return components
