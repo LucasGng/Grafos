@@ -895,6 +895,8 @@ class Graph():
                                 file.write(f"{index} {j} {weight}\n")
   
     ####################################### TDE2 #################################### #
+    
+
 
     def degree_centrality(self):
 
@@ -903,85 +905,16 @@ class Graph():
         if self.representation == "MATRIZ":
 
             for vertex in self.array_name:
-                
-                #print(vertex)
-
+            
                 result[vertex] = (self.degree(vertex) / (len(self.array_name)-1))
         
         elif self.representation == "LISTA":
 
             for vertex in self.vertex_list:
-
-                #print(vertex)
-                #print(self.degree(vertex))
-
                 result[vertex] = (self.degree(vertex) / (len(self.vertex_list)-1))
 
-    #qqqq
         return result
 
-    """def component_extraction(self):
-
-        components_list = []
-        general_list = []
-
-        if self.representation == "LISTA":
-            
-            if self.directed == True:
-
-                return []
-            
-            for vertex in self.vertex_list:
-                
-                intermediary = []
-                
-                if vertex not in general_list:
-                    
-                    intermediary.append(vertex)
-                    
-                    for neighbor in self.get_neighbors(vertex):
-
-                        if neighbor != vertex: #only first condidition before and
-                            #print(f"vertex{vertex} neighbor {neighbor}")
-                            intermediary.append(neighbor)
-
-                        general_list.append(neighbor)
-                        
-                general_list.append(vertex)
-
-                if bool(intermediary): #verifica se está vazio
-
-                    components_list.append(intermediary)
-                    
-        elif self.representation == "MATRIZ":
-
-            if self.directed == True:
-
-                return []
-            
-            for vertex in self.array_name:
-                
-                intermediary = []
-                
-                if vertex not in general_list:
-                    
-                    intermediary.append(vertex)
-                    
-                    for neighbor in self.get_neighbors(vertex):
-                        
-                        if neighbor != vertex:
-                            #print(f"vertex{vertex} neighbor {neighbor}")
-                            intermediary.append(neighbor)
-
-                        general_list.append(neighbor)
-                        
-                general_list.append(vertex)
-
-                if bool(intermediary): #verifica se está vazio
-
-                    components_list.append(intermediary)
-    
-        return components_list"""
     
     #EXTRAÇÃO DE COMPONENTES
     def component_extraction(self):
@@ -1012,20 +945,77 @@ class Graph():
 
         return components_list
     
+
+    # Busca em profundidade para armazenar os tempos de visita de cada nó
+    def DFS_finish_time(self, vertex, visited, finish_time, time=0):
+        visited.add(vertex)
+        for neighbor in self.get_neighbors(vertex):
+            if neighbor not in visited:
+                time = self.DFS_finish_time(neighbor, visited, finish_time, time)
+        finish_time[vertex] = time
+        return time + 1
+
+    # Metodo que gera o grafo transposto
+    def getTranspose(self):
+        g = Graph(self.directed,self.weighted,self.representation)
+
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
+        
+        for vertex in vertices:
+            g.add_vertex(vertex)
+
+        for vertex in vertices:
+            for neighbor in self.get_neighbors(vertex):
+                g.add_edge(neighbor, vertex)
+        
+        return g
+
+    # Busca em profundidade para encontrar os componentes fortemente conectados
+    def DFS_get_components(self, vertices, visited, components):
+        for vertex in vertices:
+            if vertex not in visited:
+                component = set()
+                stack = [vertex]
+                while stack:
+                    v = stack.pop()
+                    if v not in visited:
+                        visited.add(v)
+                        component.add(v)
+                        for neighbor in self.get_neighbors(v):
+                            if neighbor not in visited:
+                                stack.append(neighbor)
+                components.append(component)
+    
     # EXTRAÇÃO DE COMPONENTES FORTEMENTE CONECTADOS
     def component_extraction_directed(self):
+        visited = set()
+        finish_time = {}
+        time = 0
 
-        component_directed = []
+        if self.representation == "LISTA":
+            vertices = self.vertex_list
+        elif self.representation == "MATRIZ":
+            vertices = self.array_name
 
-        if self.directed == False:
-            
-            return []
+        for vertex in vertices:
+            if vertex not in visited:
+                time = self.DFS_finish_time(vertex, visited, finish_time, time)
+        gr = self.getTranspose()
+        visited = set()
         
-        else:
+        vertices = sorted(vertices, key=lambda v: finish_time[v], reverse=True)
 
-            component_directed.append(0) # só para testar antes da implementação
-        
-        return component_directed
+        components = []
+        components.append(gr.DFS_get_components(vertices, visited, components))
+        components.pop(-1)
+
+        return components
+    
+
+
 
     #PROCURA EM PROFUNDIDADE PROJETADA PARA A FUNÇÃO DE COMPONENT EXTRACTION
     def _dfs(self, vertex, visited): 
@@ -1098,29 +1088,6 @@ class Graph():
                 caminhos_vertex = self._dfs_dijkstra(vertex, pi)
                 for c in caminhos_vertex:
                     paths.append(c)
-
-        # paths = []
-        # for vertex in vertices:
-        #     path = []
-        #     current_node = vertex
-        #     while current_node != begin:
-        #         """if len(pi[current_node]) > 1:
-        #             debug = 1"""
-        #         for value in pi[vertex]:
-        #             #print(f"vertex{vertex} predecessors {value}")
-        #             self._dfs_dijkstra(pi, vertex)
-        #         if not pi[current_node]:  # sai se não houver predecessor
-        #             break
-        #         path.insert(0, current_node)
-        #         current_node = pi[current_node][0]  # primeiro predecessor
-        
-            # se há caminho
-            #     if path:
-            #         path.insert(0, begin)
-            #         paths.append(path)
-
-            # print(path)
-        #print(paths)
         return paths
     
     def _dfs_dijkstra(self, vertex, pi):
@@ -1149,35 +1116,6 @@ class Graph():
     
         return paths
     
-    """
-    def _dfs_dijkstra(self, vertex, pi):
-
-        caminhos = []
-        stack = [vertex]
-        caminho_atual = []
-
-        while stack:
-
-            current_vertex = stack.pop()
-            
-            caminho_atual.append(current_vertex)
-
-            #itera sobre os vizinhos do vertex da iteração atual e os adiciona no visited caso não foram adicionados
-            vizinhos = pi[current_vertex]
-            if len(vizinhos) > 0:
-            
-                for neighbor in vizinhos:
-                    stack.append(neighbor)
-            
-            else:
-                caminho_atual.reverse()
-                #caminhos.append(caminho_atual[:])
-                caminhos.append(caminho_atual)
-                #del caminho_atual[0]
-                caminho_atual = [vertex]
-            
-        #retorna os vértices alcançavéis por vertex do parâmetro
-        return caminhos""" 
         
     # FUNÇÃO DE EXCENTRICIDADE
     
@@ -1196,14 +1134,6 @@ class Graph():
             vertices = self.vertex_list
         elif self.representation == "MATRIZ":
             vertices = self.array_name
-
-        # if component_number > 1: # grafo desconexo == + de 1 componente
-
-        #     for v in vertices:
-                
-        #      ecc_dict[v] = None
-        
-        # else:
             
             # para cada vértice calcula o maior dos menores caminhos retornados pelo dijkstra múltiplo
         for v in vertices:
@@ -1240,13 +1170,6 @@ class Graph():
             max_ecc = max(eccentricity_dict.values())
             diameter_value = max_ecc
 
-            """for vertex in eccentricity_dict:
-
-                if eccentricity_dict[vertex] > max_ecc:
-
-                    diameter_dict[vertex] = eccentricity_dict[vertex]
-
-                print(f"{vertex} ecc {eccentricity_dict[vertex]}")"""
         
         #return diameter_dict
         return diameter_value
@@ -1270,13 +1193,6 @@ class Graph():
             min_ecc = min(eccentricity_dict.values())
             radius_value = min_ecc
 
-            """for vertex in eccentricity_dict:
-
-                if eccentricity_dict[vertex] < min_ecc:
-
-                    radius_dict[vertex] = eccentricity_dict[vertex]
-
-                print(f"{vertex} ecc {eccentricity_dict[vertex]}")"""
         
         #return radius_dict
         return radius_value
@@ -1305,16 +1221,10 @@ class Graph():
 
                     final_vertex.append(paths[-1])
 
-                    #print(paths[-1]) # remover dps
-                    #print(f"{v} {paths}") # remover dps
-
                     # itera sobre as arestas de cada menor caminho de um vértico coleta a soma dos pesos
                     # se um grafo for nao ponderado, o peso é 1 então equivale à propria dist. entre os vértices
-                    #dist_sum += sum(self.get_weight(paths[i], paths[i+1]) for i in range(len(paths)-1))
 
                     dist_sum += len(paths) - 1 # subtrai um porque a distância [A, B, C] de A pra C é 2 não 3
-                
-                #print(f"Vertex {v} sum {dist_sum}")
             
             if dist_sum > 0:
                 closeness_dict[v] = (len(vertices)-1) / dist_sum
@@ -1455,58 +1365,6 @@ class Graph():
             sum_centrality = 0
 
         return bet_dict
-
-    
-    """def girvan_newman(self, number_components):
-
-        components = [] # lista para ir armazenando os componentes para a criação dos subgrafos
-
-        intermediary_graph = self # copia o grafo para a remoção das arestas com maior centralidade
-
-        if self.representation == "LISTA":
-            vertices = intermediary_graph.vertex_list
-        elif self.representation == "MATRIZ":
-            vertices = intermediary_graph.array_name
-
-        for v in vertices:
-            print(v)
-
-        while True:
-
-            biggest_centrality = 0
-            max_edge = ()
-            
-            # centralidade ds arestas do grafo
-            edge_centrality = intermediary_graph.edge_betweenness_centrality()
-
-            for edge in edge_centrality:
-
-                if edge_centrality[edge] > biggest_centrality:
-
-                    max_edge = edge
-                    biggest_centrality = edge_centrality[edge]
-
-                print(edge_centrality[edge])
-
-            print(max_edge) # remover dps
-            print(f"{max_edge[0]} - {max_edge[1]}") # remover dps
-
-            intermediary_graph.remove_edge(max_edge[0], max_edge[1])
-
-            if len(intermediary_graph.component_extraction()) > 1: # quebramos o grafo
-
-                for c in intermediary_graph.component_extraction():  
-                    components.append(c)
-                
-                if len(components) >= number_components:
-
-                    #for i in range(len(components)):
-                    for i in range(number_components):
-                        
-                        print(components[i])
-                    
-                    break
-                    # crie um grafo em cima de cada componente"""
             
     def girvan_newman(self, number_components):
 
@@ -1582,6 +1440,8 @@ class Graph():
         
         return average_length
     
+
+
     def array_to_graph(self, nomes):
         if len(nomes) == 1:
             pass

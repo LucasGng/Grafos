@@ -214,7 +214,7 @@ for i in range(veis):
         #extract = grafo_teste_csv.component_extraction()
         graphs = grafo_teste_csv.girvan_newman(4)
         for graph in graphs:
-            print(graph.edge_betweenness_centrality())
+            print(graph.degree_centrality())
 
         end_time = time.time()
         execution_time = end_time - start_time
