@@ -1584,23 +1584,23 @@ class Graph():
 
         while len(nomes) > 1:
 
-            pares = []
+            pares = [] # combinação entre os nelementos do array ( em pares )
             for i in range(len(nomes)):
                 for j in range(i + 1, len(nomes)):
                     pares.append((nomes[i], nomes[j]))
 
-            nomes.pop(0)
+            nomes.pop(0) 
 
-            for par1, par2 in pares:
+            for par1, par2 in pares: # verifica se os vertices ja existem
                 if self.check_vertex(par1) == False:
                     self.add_vertex(par1)
                 if self.check_vertex(par2) == False:
                     self.add_vertex(par2)
 
 
-                if self.check_edge(par1, par2) == False:
+                if self.check_edge(par1, par2) == False: # cria uma conexão se não existir
                     self.add_edge(par1, par2)
 
-                if self.check_edge(par1, par2) == True:
+                if self.check_edge(par1, par2) == True: # aumenta modifica o peso se ja existir uma conexão
                     new_weight = self.get_weight(par1, par2) + 1
                     self.update_weight(par1, par2, new_weight)
