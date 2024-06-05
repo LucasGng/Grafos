@@ -1197,28 +1197,28 @@ class Graph():
         elif self.representation == "MATRIZ":
             vertices = self.array_name
 
-        if component_number > 1: # grafo desconexo == + de 1 componente
+        # if component_number > 1: # grafo desconexo == + de 1 componente
 
-            for v in vertices:
+        #     for v in vertices:
                 
-             ecc_dict[v] = None
+        #      ecc_dict[v] = None
         
-        else:
+        # else:
             
             # para cada vértice calcula o maior dos menores caminhos retornados pelo dijkstra múltiplo
-            for v in vertices:
+        for v in vertices:
 
-                v_paths = self.multiple_dijkstra(v)
+            v_paths = self.multiple_dijkstra(v)
 
-                if len(v_paths) > 0: # para grafos direcionados onde não há como sair de um vértice
+            if len(v_paths) > 0: # para grafos direcionados onde não há como sair de um vértice
 
-                    #max_path = max(i for i in self.multiple_dijkstra(v)) # apagar dps
-                    max_length = max(len(i) for i in self.multiple_dijkstra(v))
+                #max_path = max(i for i in self.multiple_dijkstra(v)) # apagar dps
+                max_length = max(len(i) for i in self.multiple_dijkstra(v))
 
-                    #print(f"vertex {v} eccentrcity: {max_path} length: {max_length}") #apagar dps
-                
-                    # decrementa um para desconsiderar o vértice de sáida
-                    ecc_dict[v] = max_length-1 
+                #print(f"vertex {v} eccentrcity: {max_path} length: {max_length}") #apagar dps
+            
+                # decrementa um para desconsiderar o vértice de sáida
+                ecc_dict[v] = max_length-1 
 
         return ecc_dict
 
@@ -1233,7 +1233,7 @@ class Graph():
         #diameter_dict = {}
         diameter_value = None
 
-        if component_number == 1: # grafo desconexo == + de 1 componente
+        if component_number >= 1: # grafo desconexo == + de 1 componente
 
             eccentricity_dict = self.get_eccentricity()
 
@@ -1263,7 +1263,7 @@ class Graph():
         #radius_dict = {}
         radius_value = None
 
-        if component_number == 1: # grafo desconexo == + de 1 componente
+        if component_number >= 1: # grafo desconexo == + de 1 componente
 
             eccentricity_dict = self.get_eccentricity()
 
@@ -1543,10 +1543,64 @@ class Graph():
             # Se o número de componentes foi alcançado
             if len(components) >= number_components:
 
-                # for component in components:
-
-                    # cria o grafo, itera ele pra criar os vértices, talvez um outro for mais interno para 
-                    # verificar se os vértices tem conexão entre sí e criar arestas entre eles
+                for comunidade in components:
+                    self.array_to_graph(comunidade)
                 break
 
         return components ######### DEVE RETORNAR UMA LISTA COM OS GRAFOS?
+        
+        
+    def average_geodesic_distances(self):
+        incrementador = 0
+        total_paths = 0
+
+        if self.representation == "LISTA":
+        
+            for v in self.vertex_list:
+                for path in self.multiple_dijkstra(v):
+                    for i in range(len(path) - 1):
+                        incrementador += self.get_weight(path[i], path[i + 1])
+                        total_paths += 1
+        else:
+            for v in self.vertex_matrix:
+                for path in self.multiple_dijkstra(v):
+                    for i in range(len(path) - 1):
+                        incrementador += self.get_weight(path[i], path[i + 1])
+                        total_paths += 1
+
+                    
+        if total_paths > 0:
+            average_length = incrementador / total_paths
+        else:
+            average_length = 0
+        
+        return average_length
+    
+
+
+    def array_to_graph(self, nomes):
+        if len(nomes) == 1:
+            pass
+
+        while len(nomes) > 1:
+
+            pares = []
+            for i in range(len(nomes)):
+                for j in range(i + 1, len(nomes)):
+                    pares.append((nomes[i], nomes[j]))
+
+            nomes.pop(0)
+
+            for par1, par2 in pares:
+                if self.check_vertex(par1) == False:
+                    self.add_vertex(par1)
+                if self.check_vertex(par2) == False:
+                    self.add_vertex(par2)
+
+
+                if self.check_edge(par1, par2) == False:
+                    self.add_edge(par1, par2)
+
+                if self.check_edge(par1, par2) == True:
+                    new_weight = self.get_weight(par1, par2) + 1
+                    self.update_weight(par1, par2, new_weight)
