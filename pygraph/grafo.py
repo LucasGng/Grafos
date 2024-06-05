@@ -1232,7 +1232,8 @@ class Graph():
 
         #diameter_dict = {}
         diameter_value = None
-
+        
+                        # == pra >=
         if component_number >= 1: # grafo desconexo == + de 1 componente
 
             eccentricity_dict = self.get_eccentricity()
@@ -1262,7 +1263,8 @@ class Graph():
 
         #radius_dict = {}
         radius_value = None
-
+        
+                        # == pra >=
         if component_number >= 1: # grafo desconexo == + de 1 componente
 
             eccentricity_dict = self.get_eccentricity()
@@ -1544,7 +1546,7 @@ class Graph():
             if len(components) >= number_components:
 
                 for comunidade in components:
-                    self.array_to_graph(comunidade)
+                    self.array_to_graph(comunidade) # adicionado a criação do grafo
                 break
 
         return components ######### DEVE RETORNAR UMA LISTA COM OS GRAFOS?
@@ -1562,7 +1564,7 @@ class Graph():
                         incrementador += self.get_weight(path[i], path[i + 1])
                         total_paths += 1
         else:
-            for v in self.vertex_matrix:
+            for v in self.array_name:
                 for path in self.multiple_dijkstra(v):
                     for i in range(len(path) - 1):
                         incrementador += self.get_weight(path[i], path[i + 1])
