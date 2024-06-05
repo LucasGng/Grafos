@@ -30,150 +30,203 @@ for i in df['NOMES_AJUSTADOS']:
     grafo_teste_csv.array_to_graph(nomes)
 
 
-# 1. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+awa = int(input("qualeah: "))
+veis = 1
+tempos = []
 
-# start_time = time.time()
+total_time = 0
 
-# degr_centrality = grafo_teste_csv.degree_centrality()
-# ceytroem_ordenado = dict(sorted(degr_centrality.items(), key=lambda item: item[1]))
-# print(ceytroem_ordenado)
+for i in range(veis):
+    if awa == 1:
 
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução degree_centrality():", execution_time, "segundos")
+        # 1. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+        start_time = time.time()
 
-# 2. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        degr_centrality = grafo_teste_csv.degree_centrality()
+        ceytroem_ordenado = dict(sorted(degr_centrality.items(), key=lambda item: item[1]))
+        print(ceytroem_ordenado)
 
-# start_time = time.time()
-
-# extract_comp = grafo_teste_csv.component_extraction()
-# print(len(extract_comp[0]))
-
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução component_extraction():", execution_time, "segundos")
-
-
-# 3. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# start_time = time.time()
-
-# grafo_teste_csv.distribution_of_degree()
-
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução distribution_of_degree():", execution_time, "segundos")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução degree_centrality():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
 
 
-# 4. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    if awa == 2:
+        # 2. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# start_time = time.time()
+        start_time = time.time()
 
-# degr_centrality = grafo_teste_csv.degree_centrality()
-# degr_centrality_ord = dict(sorted(degr_centrality.items(), key=lambda item: item[1]))
-# print(degr_centrality_ord)
+        extract_comp = grafo_teste_csv.component_extraction()
+        print(len(extract_comp[0]))
 
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução degree_centrality():", execution_time, "segundos")
-
-
-# 5. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# start_time = time.time()
-
-# between_centrality = grafo_teste_csv.betweenness_centrality()
-# between_centrality_ord = dict(sorted(between_centrality.items(), key=lambda item: item[1]))
-# print(between_centrality_ord)
-
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução betweenness_centrality():", execution_time, "segundos")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução component_extraction():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
 
 
-# 6. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    if awa == 3:
+        # 3. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# start_time = time.time()
+        start_time = time.time()
 
-# close_centrality = grafo_teste_csv.closeness_centrality()
-# close_centrality_ord = dict(sorted(close_centrality.items(), key=lambda item: item[1]))
-# print(close_centrality_ord)
+        grafo_teste_csv.distribution_of_degree()
 
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução closeness_centrality():", execution_time, "segundos")
-
-
-
-# 7. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# start_time = time.time()
-
-# eccentricity = grafo_teste_csv.get_eccentricity()
-# print(eccentricity)
-
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução get_eccentricity():", execution_time, "segundos")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução distribution_of_degree():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
 
 
+    if awa == 4:
+        # 4. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# 8. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        start_time = time.time()
 
-# start_time = time.time()
+        degr_centrality = grafo_teste_csv.degree_centrality()
+        degr_centrality_ord = dict(sorted(degr_centrality.items(), key=lambda item: item[1]))
+        print(degr_centrality_ord)
 
-# print(f"diametro: {grafo_teste_csv.get_diameter()}")
-
-# end_time = time.time()
-# execution_time_diameter = end_time - start_time
-# print("Tempo de execução get_diameter(): ", execution_time_diameter, "segundos")
-
-# -------------------------
-
-# start_time = time.time()
-
-# print(f"diametro: {grafo_teste_csv.get_radius()}")
-
-# end_time = time.time()
-# execution_time_radius = end_time - start_time
-# print("Tempo de execução get_redius(): ", execution_time_radius, "segundos")
-# print(f"Total: {execution_time_diameter + execution_time_radius}")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução degree_centrality():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
 
 
-# 9. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    if awa == 5:
+        # 5. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# start_time = time.time()
+        start_time = time.time()
 
-# between_centrality_edges = grafo_teste_csv.edge_betweenness_centrality()
-# between_centrality_edges_ord = dict(sorted(between_centrality_edges.items(), key=lambda item: item[1]))
-# print(between_centrality_edges_ord)
+        between_centrality = grafo_teste_csv.betweenness_centrality()
+        between_centrality_ord = dict(sorted(between_centrality.items(), key=lambda item: item[1]))
+        print(between_centrality_ord)
 
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução edge_betweenness_centrality():", execution_time, "segundos")
-
-
-# 10. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-# start_time = time.time()
-
-# print(grafo_teste_csv.average_geodesic_distances())
-
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução:", execution_time, "segundos")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução betweenness_centrality():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
 
 
-# 11. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    if awa == 6:
+        # 6. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# start_time = time.time()
+        start_time = time.time()
 
-# extract = grafo_teste_csv.component_extraction()
-# grafo_teste_csv.girvan_newman(4)
+        close_centrality = grafo_teste_csv.closeness_centrality()
+        close_centrality_ord = dict(sorted(close_centrality.items(), key=lambda item: item[1]))
+        print(close_centrality_ord)
 
-# end_time = time.time()
-# execution_time = end_time - start_time
-# print("Tempo de execução girvan_newman():", execution_time, "segundos")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução closeness_centrality():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+
+
+    if awa == 7:
+        # 7. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+        start_time = time.time()
+
+        eccentricity = grafo_teste_csv.get_eccentricity()
+        eccentricity_ord = dict(sorted(eccentricity.items(), key=lambda item: item[1]))
+        print(eccentricity_ord)
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução get_eccentricity():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+
+    if awa == 8:
+        # 8. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+        start_time = time.time()
+
+        print(f"diametro: {grafo_teste_csv.get_diameter()}")
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução get_diameter(): ", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+        # -------------------------
+
+    if awa == 85:
+        start_time = time.time()
+
+        print(f"raio: {grafo_teste_csv.get_radius()}")
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução get_redius(): ", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+
+    if awa == 9:
+        # 9. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+        start_time = time.time()
+
+        between_centrality_edges = grafo_teste_csv.edge_betweenness_centrality()
+        between_centrality_edges_ord = dict(sorted(between_centrality_edges.items(), key=lambda item: item[1]))
+        print(between_centrality_edges_ord)
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução edge_betweenness_centrality():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+
+    if awa == 10:
+        # 10. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+        start_time = time.time()
+
+        print(grafo_teste_csv.average_geodesic_distances())
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução average_geodesic_distances():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+
+    if awa == 11:
+        # 11. =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+        start_time = time.time()
+
+        #extract = grafo_teste_csv.component_extraction()
+        graphs = grafo_teste_csv.girvan_newman(4)
+        for graph in graphs:
+            print(graph.degree_centrality())
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Tempo de execução girvan_newman():", execution_time, "segundos")
+        tempos.append(execution_time)
+        total_time += execution_time
+
+
+
+print(f"- valores de tempo: {tempos}\
+      \n- tempo total: {total_time}\
+      \n- media {total_time/veis}")
+
 
 

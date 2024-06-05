@@ -1232,8 +1232,7 @@ class Graph():
 
         #diameter_dict = {}
         diameter_value = None
-        
-                        # == pra >=
+
         if component_number >= 1: # grafo desconexo == + de 1 componente
 
             eccentricity_dict = self.get_eccentricity()
@@ -1263,8 +1262,7 @@ class Graph():
 
         #radius_dict = {}
         radius_value = None
-        
-                        # == pra >=
+
         if component_number >= 1: # grafo desconexo == + de 1 componente
 
             eccentricity_dict = self.get_eccentricity()
@@ -1528,12 +1526,12 @@ class Graph():
                     max_edge = edge
                     biggest_centrality = edge_centrality[edge]
                 
-                print(f"{edge_centrality[edge]}")
+                #print(f"{edge_centrality[edge]}")
 
             # Remover aresta com maior centralidade
             self.remove_edge(max_edge[0], max_edge[1])
 
-            print(f"{max_edge[0]} {max_edge[1]}") #remover dps
+            #print(f"{max_edge[0]} {max_edge[1]}") #remover dps
 
             # pega os componentes
             extracted_components = self.component_extraction()
@@ -1544,12 +1542,18 @@ class Graph():
             
             # Se o número de componentes foi alcançado
             if len(components) >= number_components:
+                print(components)
+                graphlist = []
 
                 for comunidade in components:
-                    self.array_to_graph(comunidade) # adicionado a criação do grafo
+                    
+                    comunidade_graph = Graph(self.directed, self.weighted, self.representation)
+                    comunidade_graph.array_to_graph(comunidade)
+                    graphlist.append(comunidade_graph)
+
                 break
 
-        return components ######### DEVE RETORNAR UMA LISTA COM OS GRAFOS?
+        return graphlist ######### DEVE RETORNAR UMA LISTA COM OS GRAFOS?
         
         
     def average_geodesic_distances(self):
@@ -1586,23 +1590,23 @@ class Graph():
 
         while len(nomes) > 1:
 
-            pares = [] # combinação entre os nelementos do array ( em pares )
+            pares = []
             for i in range(len(nomes)):
                 for j in range(i + 1, len(nomes)):
                     pares.append((nomes[i], nomes[j]))
 
-            nomes.pop(0) 
+            nomes.pop(0)
 
-            for par1, par2 in pares: # verifica se os vertices ja existem
+            for par1, par2 in pares:
                 if self.check_vertex(par1) == False:
                     self.add_vertex(par1)
                 if self.check_vertex(par2) == False:
                     self.add_vertex(par2)
 
 
-                if self.check_edge(par1, par2) == False: # cria uma conexão se não existir
+                if self.check_edge(par1, par2) == False:
                     self.add_edge(par1, par2)
 
-                if self.check_edge(par1, par2) == True: # aumenta modifica o peso se ja existir uma conexão
+                if self.check_edge(par1, par2) == True:
                     new_weight = self.get_weight(par1, par2) + 1
                     self.update_weight(par1, par2, new_weight)
